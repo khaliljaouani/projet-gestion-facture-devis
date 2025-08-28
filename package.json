@@ -11,7 +11,8 @@
     "start": "electron electron/main.js",
     "build:ui": "cd frontend && npm run build",
     "pack": "npm run build:ui && set NODE_ENV=production&& npx --yes @electron/packager@latest . GestionApp --platform=win32 --arch=x64 --overwrite --out=release --no-prune --asar.unpackDir=node_modules/sqlite3/**",
-    "dist:win": "npm run build:ui && set NODE_ENV=production&& electron-builder --win --x64"
+    "dist:win": "npm run build:ui && set NODE_ENV=production&& electron-builder --win --x64",
+    "dist:win:pub": "npm run build:ui && set NODE_ENV=production&& electron-builder --win --x64 --publish always"
   },
   "build": {
     "appId": "com.gestion.app",
@@ -28,6 +29,14 @@
     "asar": true,
     "asarUnpack": [
       "node_modules/sqlite3/**"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "khaliljaouani",
+        "repo": "projet-gestion-facture-devis",
+        "releaseType": "release"
+      }
     ],
     "nsis": {
       "oneClick": false,
