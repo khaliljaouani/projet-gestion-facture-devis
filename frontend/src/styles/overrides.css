@@ -1,0 +1,38 @@
+/* src/styles/overrides.css */
+html, body, #root {
+  height: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#root {
+  max-width: none !important;
+  text-align: initial !important;
+}
+
+/* Si une classe container/bootstrap/tailwind limite la largeur */
+.container, .wrapper, .content, .page {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Layout de base si besoin */
+.app-frame {
+  display: flex !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+}
+
+aside { /* ta sidebar */
+  flex: 0 0 240px !important;
+}
+
+.main {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;       /* important pour que la grille s'étire */
+  background: #f4f8fb;
+  padding: 2rem;
+  overflow-y: auto;
+}

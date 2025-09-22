@@ -1,10 +1,28 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Reset global */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
+/* Root container sans limite de largeur */
+#root {
+  max-width: none;       /* supprime la limite à 1280px */
+  margin: 0;             /* supprime le centrage automatique */
+  padding: 0;            /* padding retiré ici */
+  text-align: initial;   /* on enlève le text-align center par défaut */
+}
+
+/* Si tu veux un peu d’air autour du contenu, fais-le dans .main ou .page */
+.main {
+  flex: 1;
+  background: #f4f8fb;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Le reste de ton CSS (optionnel, déjà présent dans ton template Vite) */
 .logo {
   height: 6em;
   padding: 1.5em;

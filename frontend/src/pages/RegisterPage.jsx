@@ -1,53 +1,67 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import API_URL from '../apiBase';
+import { api } from "../apiBase"; // ou "./apibase" selon le chemin
 
 const RegisterPage = () => {
   const [prenom, setPrenom] = useState('');
   const [nom, setNom] = useState('');
   const [motDePasse, setMotDePasse] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const API_URL =
-  (import.meta.env && import.meta.env.VITE_API_URL)
-  || (import.meta.env && import.meta.env.DEV ? 'http://localhost:4001' : window.location.origin);
+  const norm = (s = '') =>
+    s.toString().trim()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '_')
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, '');
 
-  const makeUsername = (p, n) => {
-    const norm = (s) =>
-      s
-        .toString()
-        .trim()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, '_')
-        .toLowerCase();
-    return `${norm(p)}_${norm(n)}`;
-  };
+  const makeUsername = (p, n) => `${norm(p)}_${norm(n)}`.replace(/^_+|_+$/g, '');
+  const usernamePreview = makeUsername(prenom, nom);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (motDePasse !== confirm) {
-      toast.error('Les mots de passe ne correspondent pas');
-      return;
-    }
+    if (loading) return;
+
+    if (!prenom || !nom) return toast.error('Prénom et Nom requis');
+    if (!motDePasse || motDePasse.length < 2) return toast.error('Mot de passe trop court');
+    if (motDePasse !== confirm) return toast.error('Les mots de passe ne correspondent pas');
+
     try {
-      const { data } = await axios.post(`${API_URL}/api/auth/register`, {
-        prenom, nom, mot_de_passe: motDePasse,
-      });
-      toast.success(
-        `Compte créé : ${data.user.nom_utilisateur}. Vous pouvez vous connecter.`
-      );
-      navigate('/login');
+      setLoading(true);
+
+      // ⚠️ le backend attend nom_utilisateur + mot_de_passe
+      const payload = {
+        nom_utilisateur: usernamePreview,
+        mot_de_passe: motDePasse,
+        // facultatif si ton contrôleur les accepte :
+        prenom,
+        nom,
+        role: 'admin', // ou 'manager' / 'user' selon ton besoin
+      };
+
+      const { data } = await api.post('/auth/register', payload);
+
+      const createdUsername =
+        data?.user?.username ??
+        data?.user?.nom_utilisateur ??
+        usernamePreview;
+
+      // si le backend renvoie déjà un token, on peut le stocker, sinon on redirige vers /login
+      if (data?.token) localStorage.setItem('token', data.token);
+
+      toast.success(`Compte créé : ${createdUsername}. Vous pouvez vous connecter.`);
+      navigate('/login', { replace: true });
     } catch (err) {
+      const msg = err?.response?.data?.error || 'Erreur lors de la création du compte';
+      toast.error(msg);
       console.error('❌ Erreur inscription :', err?.response?.data || err.message);
-      toast.error(err?.response?.data?.error || 'Erreur lors de la création du compte');
+    } finally {
+      setLoading(false);
     }
   };
-
-  const usernamePreview = makeUsername(prenom, nom);
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
@@ -62,6 +76,7 @@ const RegisterPage = () => {
                 value={prenom}
                 onChange={(e) => setPrenom(e.target.value)}
                 required
+                disabled={loading}
               />
             </div>
             <div className="col-md-6 mb-3">
@@ -71,6 +86,7 @@ const RegisterPage = () => {
                 value={nom}
                 onChange={(e) => setNom(e.target.value)}
                 required
+                disabled={loading}
               />
             </div>
           </div>
@@ -89,6 +105,7 @@ const RegisterPage = () => {
               value={motDePasse}
               onChange={(e) => setMotDePasse(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
@@ -100,10 +117,13 @@ const RegisterPage = () => {
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
-          <button className="btn btn-success w-100 mb-3">Créer le compte</button>
+          <button className="btn btn-success w-100 mb-3" disabled={loading}>
+            {loading ? 'Création…' : 'Créer le compte'}
+          </button>
 
           <div className="text-center">
             <small>
