@@ -1,11 +1,11 @@
 {
-  "name": "gestion-app",
-  "version": "1.3.3",
+  "name": "gestion-CliniCar",
+  "version": "1.0.1",
   "private": true,
   "main": "electron/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/khaliljaouani/projet-gestion-facture-devis.git"
+    "url": "https://github.com/khaliljaouani/CliniCar_Gestion"
   },
   "scripts": {
     "server": "node backend/server.js",
@@ -24,7 +24,7 @@
   },
   "build": {
     "appId": "com.gestion.app",
-    "productName": "Pneus Rouen",
+    "productName": "CliniCar",
     "electronVersion": "30.0.0",
     "directories": { "output": "dist" },
     "files": [
@@ -39,7 +39,7 @@
       {
         "provider": "github",
         "owner": "khaliljaouani",
-        "repo": "projet-gestion-facture-devis",
+        "repo": "CliniCar_Gestion",
         "releaseType": "release"
       }
     ],
